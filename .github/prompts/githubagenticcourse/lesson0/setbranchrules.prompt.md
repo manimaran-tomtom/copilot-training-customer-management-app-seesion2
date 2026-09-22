@@ -1,0 +1,1 @@
+Run `scripts/set-branch-ruleset.ps1`. It creates the `default-branch-gate` ruleset on `main`.

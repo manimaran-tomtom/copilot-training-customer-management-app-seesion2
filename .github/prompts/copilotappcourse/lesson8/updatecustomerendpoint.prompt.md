@@ -1,0 +1,1 @@
+Implement a PUT /customers/{id} endpoint that allows updating an existing customer's details. This includes the development work, unit tests, and acceptance tests. Delegate the work appropriately to the team.

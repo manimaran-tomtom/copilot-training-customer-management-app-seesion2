@@ -1,0 +1,1 @@
+Using the Microsoft Learn MCP server, review Microsoft's recommended best practices for .NET and compare them against our codebase. Identify any areas where the code does not follow those recommendations, and fix them.

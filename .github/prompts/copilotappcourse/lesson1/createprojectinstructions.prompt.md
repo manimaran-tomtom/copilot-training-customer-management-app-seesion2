@@ -1,0 +1,1 @@
+Create a .github/copilot-instructions.md file containing everything you have just learned — the application's purpose, the technology stack, the architecture and repository structure, and the build and test commands.

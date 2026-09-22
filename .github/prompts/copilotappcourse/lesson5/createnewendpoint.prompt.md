@@ -1,0 +1,1 @@
+Implement a GET /customers/{id} endpoint that retrieves a single customer by their ID. Return 200 with the customer, 404 if not found. Include unit tests.

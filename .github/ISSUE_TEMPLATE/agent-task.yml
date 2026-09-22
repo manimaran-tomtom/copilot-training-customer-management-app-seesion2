@@ -1,0 +1,52 @@
+name: "Agent Task"
+description: Define a task for an autonomous coding agent to pick up and complete.
+title: "[Agent Task]: "
+labels:
+  - agent-task
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to define a self-contained task for an autonomous agent. Fill in each section as completely as possible so the agent can work without needing clarification.
+
+  - type: textarea
+    id: context-and-inputs
+    attributes:
+      label: 1. Context and Inputs
+      description: >
+        Describe the background, the constraints, and the issue or code the task starts from.
+      placeholder: |
+        - Background: why this task exists, what problem it solves.
+        - Constraints: technical, scope, style, or process limits the agent must respect.
+        - Starting point: link to the issue, code, files, or branch this task builds on.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-outputs
+    attributes:
+      label: 2. Expected Outputs
+      description: >
+        Describe what the agent must produce: a plan, a pull request, and the evidence that the work is done.
+      placeholder: |
+        - Plan: a short written plan of the intended approach before making changes.
+        - Pull request: the code change(s) implementing the task, opened against the correct base branch.
+        - Evidence: test output, screenshots, logs, or other artifacts proving the change works as intended.
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: 3. Success Criteria
+      description: >
+        Describe how the result will be judged: the behaviour that must be correct and the checks that must pass.
+      placeholder: |
+        - Behaviour: the specific functional outcomes that must hold true.
+        - Checks: the specific tests, lint, or manual verifications required.
+
+        Note: passing CI is necessary but not sufficient. A green build-and-test run
+        does not on its own prove the task is done — the agent must also demonstrate
+        the expected behaviour is correct.
+    validations:
+      required: true

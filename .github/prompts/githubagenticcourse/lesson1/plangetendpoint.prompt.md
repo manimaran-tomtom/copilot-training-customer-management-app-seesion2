@@ -1,0 +1,1 @@
+Explore the codebase and create a detailed implementation plan for a GET customer endpoint that retrieves a single customer by its identifier. Ask clarifying questions if needed.
