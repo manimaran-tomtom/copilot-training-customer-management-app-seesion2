@@ -22,7 +22,11 @@ public sealed class ScenarioWorld : IDisposable
 
     public AddCustomerRequest? Request { get; set; }
 
+    public UpdateCustomerRequest? UpdateRequest { get; set; }
+
     public Customer? CreatedCustomer { get; set; }
+
+    public Customer? UpdatedCustomer { get; set; }
 
     public void Dispose()
     {

@@ -35,11 +35,12 @@ builder.Services.AddSwaggerGen(options =>
 
             **Current capabilities**
             - Add a new customer (`POST /customers`)
+            - Update an existing customer (`PUT /customers/{id}`)
 
             **Not included (yet)**
             - Authentication / authorisation
             - Customer retrieval or search
-            - Update or delete operations
+            - Delete operations
             """,
         Contact = new OpenApiContact
         {
@@ -188,6 +189,52 @@ app.MapPost("/customers", async (AddCustomerRequest request, AppDbContext db) =>
     "Returns `201 Created` with the saved customer, including its generated `id`. " +
     "Returns `400 Bad Request` with a validation problem if any field is missing or invalid.")
 .Produces<Customer>(StatusCodes.Status201Created)
+.ProducesValidationProblem(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status400BadRequest);
+
+// PUT /customers/{id} — updates an existing customer and returns the updated record.
+app.MapPut("/customers/{id:int}", async (int id, UpdateCustomerRequest request, AppDbContext db) =>
+{
+    // Validate the request using the data annotations declared on the model.
+    var validationResults = new List<ValidationResult>();
+    var validationContext = new ValidationContext(request);
+    if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
+    {
+        var errors = validationResults
+            .SelectMany(r => r.MemberNames.Select(name => (name, r.ErrorMessage)))
+            .GroupBy(x => x.name)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(x => x.ErrorMessage ?? "Invalid value").ToArray());
+
+        return Results.ValidationProblem(errors);
+    }
+
+    var customer = await db.Customers.FindAsync(id);
+    if (customer is null)
+    {
+        return Results.NotFound();
+    }
+
+    customer.FirstName = request.FirstName;
+    customer.LastName = request.LastName;
+    customer.Email = request.Email;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(customer);
+})
+.WithName("UpdateCustomer")
+.WithTags("Customers")
+.WithSummary("Update an existing customer")
+.WithDescription(
+    "Updates an existing customer record by `id`. " +
+    "All three fields — `firstName`, `lastName`, and `email` — are required. " +
+    "`email` must be a valid email format. " +
+    "Returns `200 OK` with the updated customer. " +
+    "Returns `404 Not Found` if the customer does not exist. " +
+    "Returns `400 Bad Request` with a validation problem if any field is missing or invalid.")
+.Produces<Customer>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound)
 .ProducesValidationProblem(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status400BadRequest);
 
