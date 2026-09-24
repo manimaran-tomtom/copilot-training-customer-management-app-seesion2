@@ -38,13 +38,15 @@ This is a minimal HTTP API that lets you create customer records and store them 
 - **Auth:** none yet (intentionally, to keep the demo simple)
 - **Frontend:** placeholder only for future exercises — for now you drive the API through Swagger or `curl`
 
-The only endpoint is:
+The current endpoints are:
 
 ```
 POST /customers
+GET /customers/{id}
 ```
 
-It accepts a JSON body with `firstName`, `lastName`, and `email`, validates them, saves the customer, and returns the created record including its generated `id`.
+- `POST /customers` accepts a JSON body with `firstName`, `lastName`, and `email`, validates them, saves the customer, and returns the created record including its generated `id`.
+- `GET /customers/{id}` returns the matching customer when it exists, otherwise `404 Not Found`.
 
 **Project structure**
 

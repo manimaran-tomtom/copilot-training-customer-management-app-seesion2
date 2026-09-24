@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using CustomerManagement.Api.Data;
 using CustomerManagement.Api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -35,10 +36,11 @@ builder.Services.AddSwaggerGen(options =>
 
             **Current capabilities**
             - Add a new customer (`POST /customers`)
+            - Retrieve a customer by id (`GET /customers/{id}`)
 
             **Not included (yet)**
             - Authentication / authorisation
-            - Customer retrieval or search
+            - Customer search
             - Update or delete operations
             """,
         Contact = new OpenApiContact
@@ -190,6 +192,25 @@ app.MapPost("/customers", async (AddCustomerRequest request, AppDbContext db) =>
 .Produces<Customer>(StatusCodes.Status201Created)
 .ProducesValidationProblem(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status400BadRequest);
+
+// GET /customers/{id} — retrieves one customer by identifier.
+// Route constraint requires id >= 1; values like 0, negatives, or non-integers
+// do not match this route and therefore return 404.
+app.MapGet("/customers/{id:int:min(1)}", async Task<Results<Ok<Customer>, NotFound>> (int id, AppDbContext db) =>
+{
+    var customer = await db.Customers.FindAsync(id);
+    return customer is null ? TypedResults.NotFound() : TypedResults.Ok(customer);
+})
+.WithName("GetCustomerById")
+.WithTags("Customers")
+.WithSummary("Get a customer by id")
+.WithDescription(
+    "Retrieves a single customer by its identifier. " +
+    "Returns `200 OK` with the customer when found. " +
+    "Returns `404 Not Found` when no customer exists for the provided id. " +
+    "Route only matches positive integer ids (`id >= 1`).")
+.Produces<Customer>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
 
 app.Run();
 
