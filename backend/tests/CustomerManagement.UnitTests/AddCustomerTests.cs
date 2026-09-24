@@ -42,6 +42,59 @@ public class AddCustomerTests
         Assert.Equal("Lovelace", created.LastName);
         Assert.Equal("ada@example.com", created.Email);
     }
+
+    [Fact]
+    public async Task GetCustomersById_WithExistingId_ReturnsCustomer()
+    {
+        await using var factory = new CustomerApiFactory();
+        var client = factory.CreateClient();
+
+        var createRequest = new AddCustomerRequest
+        {
+            FirstName = "Grace",
+            LastName = "Hopper",
+            Email = "grace@example.com"
+        };
+
+        var createResponse = await client.PostAsJsonAsync("/customers", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var created = await createResponse.Content.ReadFromJsonAsync<Customer>();
+        Assert.NotNull(created);
+
+        var getResponse = await client.GetAsync($"/customers/{created!.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var fetched = await getResponse.Content.ReadFromJsonAsync<Customer>();
+        Assert.NotNull(fetched);
+        Assert.Equal(created.Id, fetched!.Id);
+        Assert.Equal("Grace", fetched.FirstName);
+        Assert.Equal("Hopper", fetched.LastName);
+        Assert.Equal("grace@example.com", fetched.Email);
+    }
+
+    [Fact]
+    public async Task GetCustomersById_WithUnknownId_ReturnsNotFound()
+    {
+        await using var factory = new CustomerApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/customers/99999");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task GetCustomersById_WithNonPositiveId_ReturnsNotFound(int id)
+    {
+        await using var factory = new CustomerApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync($"/customers/{id}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
 
 // Boots the API for testing and replaces the SQLite file database with an
